@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Delete, Body, Param, Patch, ParseIntPipe, BadRequestException } from '@nestjs/common';
 import { CustomerService } from '../service/customer.service';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { CreateCustomerDto } from '../dtos/create-customer.dto';
 
 

@@ -10,9 +10,8 @@ async function bootstrap() {
   // Swagger Configuration
   const config = new DocumentBuilder()
     .setTitle('Restaurant Booking API')
-    .setDescription('API documentation for the restaurant booking system')
+    .setDescription('API documentation for the restaurant booking reservation system')
     .setVersion('1.0')
-    .addTag('customers')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

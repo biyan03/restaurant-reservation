@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/service/prisma.service';
 import { Prisma } from '@prisma/client';
 
@@ -7,7 +7,14 @@ export class TableService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: Prisma.TableCreateInput) {
-    return this.prisma.table.create({ data });
+    try {
+      return this.prisma.table.create({ data });
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new BadRequestException('Bad Request');
+      }
+      throw error;
+    }
   }
 
   async findAll() {

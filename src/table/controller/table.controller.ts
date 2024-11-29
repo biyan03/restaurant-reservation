@@ -1,13 +1,22 @@
-import { Controller, Post, Get, Patch, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, BadRequestException } from '@nestjs/common';
 import { TableService } from '../service/table.service';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { CreateTableDto } from '../dtos/create-table.dto';
+import { UpdateTableDto } from '../dtos/update-table.dto';
 
+@ApiTags('Table')
 @Controller('table')
 export class TableController {
   constructor(private readonly tableService: TableService) {}
 
   @Post()
-  create(@Body() data) {
-    return this.tableService.create(data);
+  create(@Body() data:CreateTableDto) {
+    try {
+      return this.tableService.create(data);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+      throw error;
+    }
   }
 
   @Get()
@@ -16,7 +25,7 @@ export class TableController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() data) {
+  update(@Param('id') id: number, @Body() data:UpdateTableDto) {
     return this.tableService.update(id, data);
   }
 
