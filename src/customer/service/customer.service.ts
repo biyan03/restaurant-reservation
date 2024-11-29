@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/service/prisma.service';
 
@@ -7,7 +7,12 @@ export class CustomerService {
     constructor(private readonly prisma: PrismaService) {}
 
     async create(data: Prisma.CustomerCreateInput) {
-      return this.prisma.customer.create({ data });
+      try {
+        return await this.prisma.customer.create({ data });
+      } catch (error) {
+        
+        throw error;
+      }
     }
   
     async get() {
@@ -18,7 +23,6 @@ export class CustomerService {
     }
   
     async update(id: number, data: Prisma.CustomerUpdateInput) {
-      console.log('ID type:', typeof id, 'ID value:', id);
       return this.prisma.customer.update({
         where: { id },
         data,
@@ -26,6 +30,13 @@ export class CustomerService {
     }
   
     async delete(id: number) {
-      return this.prisma.customer.delete({ where: { id } });
+      try {
+        return await this.prisma.customer.delete({ where: { id } });
+      } catch (error) {
+        if (error.code === 'P2025') {
+          throw new BadRequestException('Data not be found');
+        }
+        throw error;
+      }
     }
 }

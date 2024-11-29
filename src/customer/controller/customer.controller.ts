@@ -1,5 +1,7 @@
-import { Controller, Get, Post,Put,Delete,Body,Param, Patch, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post,Put,Delete,Body,Param, Patch, ParseIntPipe, BadRequestException } from '@nestjs/common';
 import { CustomerService } from '../service/customer.service';
+import { CreateCustomerDto } from '../dtos/create-customer.dto';
+
 
 @Controller('customer')
 export class CustomerController {
@@ -8,8 +10,13 @@ export class CustomerController {
     ) { }
 
     @Post()
-    create(@Body() data) {
-        return this.customerService.create(data);
+    async create(@Body() data:CreateCustomerDto) {
+        try {
+            return await this.customerService.create(data);
+          } catch (error) {
+            throw new BadRequestException(error.message);
+            throw error;
+          }
     }
 
     @Get()
@@ -23,7 +30,11 @@ export class CustomerController {
     }
 
     @Delete(':id')
-    remove(@Param('id') id: number) {
-        return this.customerService.delete(id);
+    async remove(@Param('id',ParseIntPipe) id: number) {
+        try {
+            return await this.customerService.delete(id);
+          } catch (error) {
+            throw error;
+          }
     }
 }
