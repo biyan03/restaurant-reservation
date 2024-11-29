@@ -1,4 +1,4 @@
-import { Controller, Get, Post,Put,Delete,Body,Param, Patch, ParseIntPipe, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Patch, ParseIntPipe, BadRequestException } from '@nestjs/common';
 import { CustomerService } from '../service/customer.service';
 import { CreateCustomerDto } from '../dtos/create-customer.dto';
 
@@ -24,7 +24,13 @@ export class CustomerController {
         return this.customerService.findAll();
     }
 
-    @Put(':id')
+
+    @Get(':id')
+    findById(@Param('id',ParseIntPipe) id:number) {
+      return this.customerService.getById(id);
+    }
+
+    @Patch(':id')
     update(@Param('id',ParseIntPipe) id: number, @Body() data) {
         return this.customerService.update(id, data);
     }

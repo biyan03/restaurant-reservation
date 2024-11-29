@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/service/prisma.service';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class CustomerService {
@@ -15,9 +16,12 @@ export class CustomerService {
       }
     }
   
-    async get() {
-      return this.prisma.customer.findMany();
+    async getById(id:number) {
+      return this.prisma.customer.findUnique({
+        where: { id: id }
+      }) ?? null
     }
+
     async findAll() {
       return this.prisma.customer.findMany();
     }
