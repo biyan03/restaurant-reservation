@@ -16,15 +16,21 @@ datasource db {
 model Customer {
   id    Int    @id @default(autoincrement())
   name  String
-  email String @unique
-  phone String
+  email     String   @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   reservations Reservation[]
 }
 
 model Table {
-  id       Int    @id @default(autoincrement())
-  number   Int    @unique
-  capacity Int
+  id          Int      @id @default(autoincrement())
+  number      Int      @unique // Unique table number
+  capacity    Int      // Number of seats
+  isAvailable Boolean  @default(true) // Whether the table is available for reservation
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   reservations Reservation[]
 }
 
