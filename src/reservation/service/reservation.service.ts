@@ -4,11 +4,13 @@ import { Prisma } from '@prisma/client';
 import { RestaurantHoursService } from '../../restaurant-hours/service/restaurant-hours.service';
 import { CreateReservationDto } from '../dto/create-reservation.dto';
 import { console } from 'inspector';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class ReservationService {
   constructor(private readonly prisma: PrismaService,
-    private readonly restaurantHoursService: RestaurantHoursService
+    private readonly restaurantHoursService: RestaurantHoursService,
+    private readonly emailService: EmailService
   ) {}
 
   async create(createReservationDto: CreateReservationDto) {
@@ -17,6 +19,11 @@ export class ReservationService {
     // Combine the date and time into a full DateTime object
     const reservedDate = new Date(reservedAt);
     const [hours, minutes] = reservedTime.split(':').map((timePart) => parseInt(timePart, 10));
+
+    //check back date
+    if(reservedDate< new Date()){
+      throw new BadRequestException('The reservation date has passed, please select the next date.');
+    }
 
     // Set the hour and minute of the reservation date
     reservedDate.setHours(hours, minutes, 0, 0);
@@ -79,10 +86,7 @@ export class ReservationService {
       throw new BadRequestException('The time slot is already booked.');
     }
     
-    // console.log(overlappingReservation);
-    // return [overlappingReservation];
-    
-    return this.prisma.$transaction(async (tx) => {
+    const reservation = this.prisma.$transaction(async (tx) => {
       return tx.reservation.create({
         data: {
           reservedAt: reservedDate,
@@ -93,6 +97,41 @@ export class ReservationService {
         },
       });
     });
+
+    // Get the customer
+    const customer = await this.prisma.customer.findUnique({
+      where: { id: customerId },
+    });
+    if(customer){
+      // Send email to the customer
+      const subject = `Reservation Confirmed: ${reservedDate.toLocaleString()}`;
+      const text = `Your reservation at our restaurant has been successfully confirmed! 
+      Reservation Details:
+      - Table: ${tableId}
+      - Date: ${reservedDate.toLocaleDateString()}
+      - Time: ${reservedDate.toLocaleTimeString()}
+      - Duration: ${duration} hour(s)`;
+
+      const html = `
+        <h2>Reservation Confirmation</h2>
+        <p>Your reservation at our restaurant has been successfully confirmed!</p>
+        <ul>
+          <li><strong>Table:</strong> ${tableId}</li>
+          <li><strong>Date:</strong> ${reservedDate.toLocaleDateString()}</li>
+          <li><strong>Time:</strong> ${reservedDate.toLocaleTimeString()}</li>
+          <li><strong>Duration:</strong> ${duration} hour(s)</li>
+        </ul>
+        <p>We look forward to serving you!</p>
+      `;
+
+      await this.emailService.sendReservationEmail(
+        customer.email,
+        subject,
+        text,
+        html,
+      );
+    }
+    return reservation;
 
   }
 

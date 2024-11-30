@@ -2,10 +2,11 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/service/prisma.service';
 import { NotFoundError } from 'rxjs';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class CustomerService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService,private readonly emailService:EmailService) {}
 
     async create(data: Prisma.CustomerCreateInput) {
       try {
