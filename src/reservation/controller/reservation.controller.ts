@@ -8,7 +8,7 @@ export class ReservationController {
 
   @Post()
   create(@Body() data: CreateReservationDto) {
-    return this.reservationService.create(data.customerId, data.tableId, new Date(data.reservedAt));
+    return this.reservationService.create(data);
 
   }
 

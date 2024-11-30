@@ -37,15 +37,17 @@ model Table {
 model RestaurantHours {
   id        Int      @id @default(autoincrement())
   day       String   // E.g., 'Monday', 'Tuesday', etc.
-  openTime  DateTime // Restaurant opening time (stored as datetime)
-  closeTime DateTime // Restaurant closing time (stored as datetime)
+  openTime  String // Restaurant opening time (stored as time)
+  closeTime String // Restaurant closing time (stored as time)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Reservation {
   id             Int       @id @default(autoincrement())
-  reservedAt DateTime
+  reservedAt     DateTime // reservation date, start date time
+  reservedEnd    DateTime // reservation date finish, end date time
+  status         Boolean   @default(false) // Whether the Reservation is finish
   customerId     Int
   tableId        Int
   createdAt DateTime @default(now())

@@ -8,7 +8,6 @@ export class RestaurantHoursService {
   // Get restaurant hours for a specific date
   async getRestaurantHoursForDate(date: Date) {
     const dayOfWeek = date.toLocaleString('en-us', { weekday: 'long' }); // Get the day of the week
-    console.log(dayOfWeek);
     return this.prisma.restaurantHours.findFirst({
       where: { day: dayOfWeek },
     });
