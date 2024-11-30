@@ -34,14 +34,25 @@ model Table {
   reservations Reservation[]
 }
 
+model RestaurantHours {
+  id        Int      @id @default(autoincrement())
+  day       String   // E.g., 'Monday', 'Tuesday', etc.
+  openTime  DateTime // Restaurant opening time (stored as datetime)
+  closeTime DateTime // Restaurant closing time (stored as datetime)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Reservation {
   id             Int       @id @default(autoincrement())
-  reservationDate DateTime
+  reservedAt DateTime
   customerId     Int
   tableId        Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   customer Customer @relation(fields: [customerId], references: [id])
   table    Table    @relation(fields: [tableId], references: [id])
 
-  @@unique([reservationDate, tableId]) // Prevent table double booking
+  @@unique([reservedAt, tableId]) // Prevent table double booking
 }
